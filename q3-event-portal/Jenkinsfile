@@ -30,19 +30,21 @@ pipeline {
         APP            = 'event-portal'
         IMAGE          = "${DOCKERHUB_USER}/event-portal"
         TAG            = "${BUILD_NUMBER}"
+        DOCKER_CLI     = 'C:\\Users\\suhai\\AppData\\Local\\Programs\\DockerDesktop\\resources\\bin\\docker.exe'
+        KUBECTL_CLI    = 'C:\\Users\\suhai\\AppData\\Local\\Programs\\DockerDesktop\\resources\\bin\\kubectl.exe'
     }
 
     stages {
         stage('Clone Code') {
             steps {
-                git branch: 'main', url: 'https://github.com/YOUR_GITHUB_USERNAME/event-portal.git'
+                git branch: 'main', url: 'https://github.com/suhaib08/placement-portal.git'
             }
         }
 
         stage('Build Docker Image') {
             steps {
                 script {
-                    run("docker build --build-arg FAULTY=${params.FAULTY_BUILD} -t ${IMAGE}:${TAG} -t ${IMAGE}:latest .")
+                    run("\"${DOCKER_CLI}\" build --build-arg FAULTY=${params.FAULTY_BUILD} -t ${IMAGE}:${TAG} -t ${IMAGE}:latest q3-event-portal")
                 }
             }
         }
@@ -50,7 +52,9 @@ pipeline {
         stage('Test Application') {
             steps {
                 // Verify that the image was built successfully
-                run("docker image inspect ${IMAGE}:${TAG}")
+                script {
+                    run("\"${DOCKER_CLI}\" image inspect ${IMAGE}:${TAG}")
+                }
             }
         }
 
@@ -59,9 +63,9 @@ pipeline {
                 withCredentials([usernamePassword(credentialsId: 'dockerhub-creds',
                                                   usernameVariable: 'DH_USER', passwordVariable: 'DH_PASS')]) {
                     script {
-                        run("echo ${v('DH_PASS')}| docker login -u ${v('DH_USER')} --password-stdin")
-                        run("docker push ${IMAGE}:${TAG}")
-                        run("docker push ${IMAGE}:latest")
+                        run("echo ${v('DH_PASS')}| \"${DOCKER_CLI}\" login -u ${v('DH_USER')} --password-stdin")
+                        run("\"${DOCKER_CLI}\" push ${IMAGE}:${TAG}")
+                        run("\"${DOCKER_CLI}\" push ${IMAGE}:latest")
                     }
                 }
             }
@@ -71,15 +75,15 @@ pipeline {
             steps {
                 withCredentials([file(credentialsId: 'kubeconfig', variable: 'KUBECONFIG')]) {
                     script {
-                        run("kubectl get deployment ${APP} || kubectl apply -f deployment.yaml")
-                        run("kubectl set image deployment/${APP} ${APP}=${IMAGE}:${TAG}")
+                        run("\"${KUBECTL_CLI}\" get deployment ${APP} || \"${KUBECTL_CLI}\" apply -f q3-event-portal/deployment.yaml")
+                        run("\"${KUBECTL_CLI}\" set image deployment/${APP} ${APP}=${IMAGE}:${TAG}")
 
                         try {
-                            run("kubectl rollout status deployment/${APP} --timeout=90s")
+                            run("\"${KUBECTL_CLI}\" rollout status deployment/${APP} --timeout=90s")
                         } catch (err) {
                             echo "Rollout FAILED - rolling back to previous stable release"
-                            run("kubectl rollout undo deployment/${APP}")
-                            run("kubectl rollout status deployment/${APP} --timeout=120s")
+                            run("\"${KUBECTL_CLI}\" rollout undo deployment/${APP}")
+                            run("\"${KUBECTL_CLI}\" rollout status deployment/${APP} --timeout=120s")
                             error("Release ${TAG} failed. Rolled back to previous stable version.")
                         }
                     }
@@ -90,8 +94,11 @@ pipeline {
         stage('Verify Pods') {
             steps {
                 withCredentials([file(credentialsId: 'kubeconfig', variable: 'KUBECONFIG')]) {
-                    run("kubectl get pods -l app=${APP}")
-                    run("kubectl get svc event-portal-service")
+                    script {
+                        run("\"${KUBECTL_CLI}\" get deployment ${APP}")
+                        run("\"${KUBECTL_CLI}\" get pods -l app=${APP}")
+                        run("\"${KUBECTL_CLI}\" get svc event-portal-service")
+                    }
                 }
             }
         }
@@ -102,8 +109,8 @@ pipeline {
         failure {
             withCredentials([file(credentialsId: 'kubeconfig', variable: 'KUBECONFIG')]) {
                 script {
-                    run("kubectl get pods -l app=${APP}")
-                    run("kubectl rollout history deployment/${APP}")
+                    run("\"${KUBECTL_CLI}\" get pods -l app=${APP}")
+                    run("\"${KUBECTL_CLI}\" rollout history deployment/${APP}")
                 }
             }
         }
