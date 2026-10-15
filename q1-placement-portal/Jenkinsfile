@@ -43,7 +43,9 @@ pipeline {
 
         stage('Test Application') {
             steps {
-                run("docker image inspect ${IMAGE}:${TAG}")
+                script {
+                    run("docker image inspect ${IMAGE}:${TAG}")
+                }
             }
         }
 
@@ -85,8 +87,10 @@ pipeline {
         stage('Verify Pods') {
             steps {
                 withCredentials([file(credentialsId: 'kubeconfig', variable: 'KUBECONFIG')]) {
-                    run("kubectl get pods -l app=${APP}")
-                    run("kubectl get svc placement-portal-service")
+                    script {
+                        run("kubectl get pods -l app=${APP}")
+                        run("kubectl get svc placement-portal-service")
+                    }
                 }
             }
         }
