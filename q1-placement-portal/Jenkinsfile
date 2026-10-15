@@ -7,7 +7,7 @@
 def run(String cmd) {
     if (isUnix()) { sh cmd } else { bat cmd }
 }
-def v(String name) {            // environment variable reference per OS
+def v(String name) {
     return isUnix() ? "\$${name}" : "%${name}%"
 }
 
@@ -29,21 +29,20 @@ pipeline {
     stages {
         stage('Clone Code') {
             steps {
-                git branch: 'main', url: 'https://github.com/YOUR_GITHUB_USERNAME/placement-portal.git'
+                git branch: 'main', url: 'https://github.com/suhaib08/placement-portal.git'
             }
         }
 
         stage('Build Docker Image') {
             steps {
                 script {
-                    run("docker build --build-arg FAULTY=${params.FAULTY_BUILD} -t ${IMAGE}:${TAG} -t ${IMAGE}:latest .")
+                    run("docker build --build-arg FAULTY=${params.FAULTY_BUILD} -t ${IMAGE}:${TAG} -t ${IMAGE}:latest q1-placement-portal")
                 }
             }
         }
 
         stage('Test Application') {
             steps {
-                // Image must exist and contain the page
                 run("docker image inspect ${IMAGE}:${TAG}")
             }
         }
@@ -65,8 +64,8 @@ pipeline {
             steps {
                 withCredentials([file(credentialsId: 'kubeconfig', variable: 'KUBECONFIG')]) {
                     script {
-                        // Create Deployment + Service only the first time
-                        run("kubectl get deployment ${APP} || kubectl apply -f deployment.yaml")
+                        // Create the Deployment and Service the first time.
+                        run("kubectl get deployment ${APP} || kubectl apply -f q1-placement-portal/deployment.yaml")
                         run("kubectl set image deployment/${APP} ${APP}=${IMAGE}:${TAG}")
 
                         try {
@@ -94,7 +93,9 @@ pipeline {
     }
 
     post {
-        success { echo "Deployed. Open http://localhost:30081" }
+        success {
+            echo "Deployed. Open http://localhost:30081"
+        }
         failure {
             withCredentials([file(credentialsId: 'kubeconfig', variable: 'KUBECONFIG')]) {
                 script {
