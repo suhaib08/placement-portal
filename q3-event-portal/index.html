@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>College Event Management Portal</title>
+<style>
+  :root { --purple:#5b21b6; --pink:#db2777; --bg:#f6f3fb; --card:#fff; --muted:#625a73; --ok:#15803d; }
+  * { box-sizing:border-box; margin:0; padding:0; }
+  body { font-family:"Segoe UI",Arial,sans-serif; background:var(--bg); color:#1f1a2e; line-height:1.5; }
+  header { background:linear-gradient(120deg,var(--purple),var(--pink)); color:#fff; text-align:center; padding:36px 16px; }
+  header p { opacity:.9; margin-top:6px; }
+  nav { background:#fff; text-align:center; padding:10px; box-shadow:0 1px 4px rgba(0,0,0,.08); position:sticky; top:0; }
+  nav a { color:var(--purple); margin:0 12px; text-decoration:none; font-weight:600; font-size:.93rem; }
+  main { max-width:1050px; margin:0 auto; padding:10px 16px 50px; }
+  section { margin-top:34px; }
+  h2 { color:var(--purple); margin-bottom:14px; }
+  .grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(240px,1fr)); gap:16px; }
+  .card { background:var(--card); border-radius:12px; padding:18px; box-shadow:0 1px 5px rgba(0,0,0,.09); }
+  .badge { display:inline-block; font-size:.75rem; color:#fff; background:var(--pink); padding:2px 10px; border-radius:12px; margin-bottom:8px; }
+  .meta { color:var(--muted); font-size:.9rem; margin-top:6px; }
+  .event { border-top:4px solid var(--purple); }
+  table { width:100%; border-collapse:collapse; background:var(--card); border-radius:12px; overflow:hidden; box-shadow:0 1px 5px rgba(0,0,0,.09); }
+  th, td { padding:11px 14px; text-align:left; font-size:.93rem; }
+  th { background:var(--purple); color:#fff; }
+  tr:nth-child(even) td { background:#faf8fe; }
+  ol { margin-left:22px; } li { margin:6px 0; }
+  form { display:grid; gap:10px; max-width:480px; }
+  input, select { padding:10px; border:1px solid #cfc7e0; border-radius:8px; font-size:1rem; }
+  button { padding:10px 16px; border:0; border-radius:8px; background:var(--purple); color:#fff; font-size:1rem; cursor:pointer; }
+  #regmsg, #statusmsg { margin-top:10px; font-weight:600; }
+  footer { text-align:center; color:var(--muted); padding:20px; font-size:.85rem; }
+</style>
+</head>
+<body>
+<header>
+  <h1>College Event Management Portal</h1>
+  <p>Symposiums &middot; Hackathons &middot; Workshops &middot; Cultural Fests &middot; Inter-College Competitions</p>
+</header>
+<nav>
+  <a href="#events">Events</a><a href="#schedule">Schedule</a><a href="#venues">Venues</a>
+  <a href="#howto">How to Register</a><a href="#register">Register</a><a href="#status">Check Status</a>
+</nav>
+<main>
+
+  <section id="events">
+    <h2>Upcoming Events</h2>
+    <div class="grid">
+      <div class="card event"><span class="badge">Technical</span><h3>TechNova Symposium</h3>
+        <p>Paper presentations, project expo and industry keynotes.</p><p class="meta">Limit: 300 participants</p></div>
+      <div class="card event"><span class="badge">Hackathon</span><h3>CodeStorm 24H</h3>
+        <p>24-hour team hackathon on cloud, DevOps and AI problem statements.</p><p class="meta">Limit: 120 (teams of 3&ndash;4)</p></div>
+      <div class="card event"><span class="badge">Workshop</span><h3>Kubernetes in a Day</h3>
+        <p>Hands-on workshop: Docker, Jenkins and Kubernetes deployments.</p><p class="meta">Limit: 60 seats</p></div>
+      <div class="card event"><span class="badge">Cultural</span><h3>Vibrance Fest</h3>
+        <p>Music, dance, drama and art competitions across two days.</p><p class="meta">Open entry</p></div>
+      <div class="card event"><span class="badge">Inter-College</span><h3>Inter-College Quiz League</h3>
+        <p>Teams from 20+ colleges compete across technical and general rounds.</p><p class="meta">Limit: 80 teams</p></div>
+    </div>
+  </section>
+
+  <section id="schedule">
+    <h2>Event Schedule</h2>
+    <table>
+      <tr><th>Date</th><th>Event</th><th>Time</th><th>Venue</th></tr>
+      <tr><td>05 Nov 2026</td><td>Kubernetes in a Day</td><td>9:30 AM &ndash; 4:30 PM</td><td>Computer Lab 3</td></tr>
+      <tr><td>12 Nov 2026</td><td>TechNova Symposium</td><td>9:00 AM &ndash; 5:00 PM</td><td>Main Auditorium</td></tr>
+      <tr><td>19&ndash;20 Nov 2026</td><td>CodeStorm 24H</td><td>10:00 AM (Day 1) &ndash; 10:00 AM (Day 2)</td><td>Innovation Hub</td></tr>
+      <tr><td>26 Nov 2026</td><td>Inter-College Quiz League</td><td>10:00 AM &ndash; 3:00 PM</td><td>Seminar Hall B</td></tr>
+      <tr><td>04&ndash;05 Dec 2026</td><td>Vibrance Fest</td><td>All day</td><td>Open Air Theatre</td></tr>
+    </table>
+  </section>
+
+  <section id="venues">
+    <h2>Venues</h2>
+    <div class="grid">
+      <div class="card"><h3>Main Auditorium</h3><p class="meta">Capacity 800 &middot; Academic Block A</p></div>
+      <div class="card"><h3>Innovation Hub</h3><p class="meta">Capacity 150 &middot; Tech Park, 1st floor</p></div>
+      <div class="card"><h3>Computer Lab 3</h3><p class="meta">Capacity 60 &middot; Block C</p></div>
+      <div class="card"><h3>Open Air Theatre</h3><p class="meta">Capacity 1500 &middot; Central Lawn</p></div>
+    </div>
+  </section>
+
+  <section id="howto">
+    <h2>Registration Instructions</h2>
+    <div class="card">
+      <ol>
+        <li>Fill in the registration form below with your name, register number and chosen event.</li>
+        <li>Note your registration ID shown on the screen &ndash; you need it to check status.</li>
+        <li>Team events: only the team leader registers, listing all members at the help desk.</li>
+        <li>Registration closes 3 days before each event or when the participant limit is reached.</li>
+        <li>Carry your college ID card on the day of the event.</li>
+      </ol>
+    </div>
+  </section>
+
+  <section id="register">
+    <h2>Register for an Event</h2>
+    <div class="card">
+      <form id="regform">
+        <input id="name" placeholder="Full name" required>
+        <input id="regno" placeholder="Register number" required>
+        <select id="event" required>
+          <option value="">Select event</option>
+          <option>TechNova Symposium</option><option>CodeStorm 24H</option><option>Kubernetes in a Day</option>
+          <option>Vibrance Fest</option><option>Inter-College Quiz League</option>
+        </select>
+        <button type="submit">Register</button>
+      </form>
+      <p id="regmsg"></p>
+    </div>
+  </section>
+
+  <section id="status">
+    <h2>Check Registration Status</h2>
+    <div class="card">
+      <form id="statusform">
+        <input id="rid" placeholder="Registration ID e.g. EVT-1234" required>
+        <button type="submit">Check Status</button>
+      </form>
+      <p id="statusmsg"></p>
+    </div>
+  </section>
+
+  <!-- NEW FEATURE HERE -->
+</main>
+<footer>Deployed automatically via GitHub &middot; Jenkins &middot; Docker Hub &middot; Kubernetes</footer>
+
+<script>
+  // Demo only: registrations are kept in this browser (no backend).
+  function load() { try { return JSON.parse(localStorage.getItem('regs') || '{}'); } catch (e) { return {}; } }
+  function save(r) { try { localStorage.setItem('regs', JSON.stringify(r)); } catch (e) {} }
+
+  document.getElementById('regform').addEventListener('submit', function (e) {
+    e.preventDefault();
+    var id = 'EVT-' + Math.floor(1000 + Math.random() * 9000);
+    var regs = load();
+    regs[id] = { name: document.getElementById('name').value, event: document.getElementById('event').value };
+    save(regs);
+    document.getElementById('regmsg').textContent = 'Registered! Your registration ID is ' + id;
+    this.reset();
+  });
+
+  document.getElementById('statusform').addEventListener('submit', function (e) {
+    e.preventDefault();
+    var r = load()[document.getElementById('rid').value.trim().toUpperCase()];
+    document.getElementById('statusmsg').textContent = r
+      ? 'Confirmed: ' + r.name + ' is registered for ' + r.event + '.'
+      : 'No registration found for that ID.';
+  });
+</script>
+</body>
+</html>

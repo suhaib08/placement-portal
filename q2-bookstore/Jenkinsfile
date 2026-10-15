@@ -1,0 +1,122 @@
+// Q2 - Online Bookstore with automated testing and deployment gates
+// Credentials needed in Jenkins:
+//   dockerhub-creds : Username with password
+//   kubeconfig      : Secret file (your ~/.kube/config)
+
+def run(String cmd) {
+    if (isUnix()) { sh cmd } else { bat cmd }
+}
+def v(String name) {
+    return isUnix() ? "\$${name}" : "%${name}%"
+}
+
+pipeline {
+    agent any
+
+    parameters {
+        booleanParam(name: 'FAULTY_BUILD', defaultValue: false,
+                     description: 'Tick to build a deliberately broken image (demo auto-rollback)')
+    }
+
+    environment {
+        DOCKERHUB_USER = 'suhaib08'
+        APP            = 'bookstore'
+        IMAGE          = "${DOCKERHUB_USER}/bookstore"
+        TAG            = "${BUILD_NUMBER}"
+    }
+
+    stages {
+        stage('Clone Code') {
+            steps {
+                git branch: 'main', url: 'https://github.com/YOUR_GITHUB_USERNAME/bookstore.git'
+            }
+        }
+
+        // GATE 1: docker build runs tests/check.sh; a failing test fails the build
+        stage('Build Docker Image') {
+            steps {
+                script {
+                    run("docker build --build-arg FAULTY=${params.FAULTY_BUILD} -t ${IMAGE}:${TAG} -t ${IMAGE}:latest .")
+                }
+            }
+        }
+
+        // GATE 2: run the same tests against the finished image
+        stage('Test Application') {
+            steps {
+                run("docker run --rm --entrypoint sh ${IMAGE}:${TAG} /tests/check.sh")
+            }
+        }
+
+        // GATE 3: block images with CRITICAL vulnerabilities (skipped if Trivy is not installed)
+        stage('Security Scan') {
+            steps {
+                script {
+                    try {
+                        run("trivy --version")
+                    } catch (e) {
+                        echo "Trivy not installed - security scan skipped"
+                        return
+                    }
+                    run("trivy image --exit-code 1 --severity CRITICAL ${IMAGE}:${TAG}")
+                }
+            }
+        }
+
+        stage('Push Image') {
+            steps {
+                withCredentials([usernamePassword(credentialsId: 'dockerhub-creds',
+                                                  usernameVariable: 'DH_USER', passwordVariable: 'DH_PASS')]) {
+                    script {
+                        run("echo ${v('DH_PASS')}| docker login -u ${v('DH_USER')} --password-stdin")
+                        run("docker push ${IMAGE}:${TAG}")
+                        run("docker push ${IMAGE}:latest")
+                    }
+                }
+            }
+        }
+
+        // GATE 4: the rollout must become healthy, otherwise automatic rollback
+        stage('Deploy to Kubernetes') {
+            steps {
+                withCredentials([file(credentialsId: 'kubeconfig', variable: 'KUBECONFIG')]) {
+                    script {
+                        run("kubectl get deployment ${APP} || kubectl apply -f deployment.yaml")
+                        run("kubectl set image deployment/${APP} ${APP}=${IMAGE}:${TAG}")
+
+                        try {
+                            run("kubectl rollout status deployment/${APP} --timeout=90s")
+                        } catch (err) {
+                            echo "Rollout FAILED - rolling back to previous stable release"
+                            run("kubectl rollout undo deployment/${APP}")
+                            run("kubectl rollout status deployment/${APP} --timeout=120s")
+                            error("Release ${TAG} failed. Rolled back to previous stable version.")
+                        }
+                    }
+                }
+            }
+        }
+
+        stage('Verify Deployment') {
+            steps {
+                withCredentials([file(credentialsId: 'kubeconfig', variable: 'KUBECONFIG')]) {
+                    run("kubectl get deployment ${APP}")
+                    run("kubectl get pods -l app=${APP}")
+                    run("kubectl get svc bookstore-service")
+                }
+            }
+        }
+    }
+
+    post {
+        success { echo "Deployed. Open http://localhost:30082" }
+        failure {
+            withCredentials([file(credentialsId: 'kubeconfig', variable: 'KUBECONFIG')]) {
+                script {
+                    run("kubectl get pods -l app=${APP}")
+                    run("kubectl rollout history deployment/${APP}")
+                }
+            }
+        }
+    }
+}

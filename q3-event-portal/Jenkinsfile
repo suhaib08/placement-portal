@@ -1,0 +1,111 @@
+// Q3 - College Event Management Website: rolling updates and rollback
+// Credentials needed in Jenkins:
+//   dockerhub-creds : Username with password
+//   kubeconfig      : Secret file (your ~/.kube/config)
+//
+// Optional: to trigger on every GitHub push, tick "GitHub hook trigger for GITScm polling"
+// in the job (needs a public Jenkins URL) or use "Poll SCM" with schedule: H/2 * * * *
+
+def run(String cmd) {
+    if (isUnix()) { sh cmd } else { bat cmd }
+}
+def v(String name) {
+    return isUnix() ? "\$${name}" : "%${name}%"
+}
+
+pipeline {
+    agent any
+
+    parameters {
+        booleanParam(name: 'FAULTY_BUILD', defaultValue: false,
+                     description: 'Tick to build a deliberately broken image (demo auto-rollback)')
+    }
+
+    triggers {
+        pollSCM('H/2 * * * *')
+    }
+
+    environment {
+        DOCKERHUB_USER = 'suhaib08'
+        APP            = 'event-portal'
+        IMAGE          = "${DOCKERHUB_USER}/event-portal"
+        TAG            = "${BUILD_NUMBER}"
+    }
+
+    stages {
+        stage('Clone Code') {
+            steps {
+                git branch: 'main', url: 'https://github.com/YOUR_GITHUB_USERNAME/event-portal.git'
+            }
+        }
+
+        stage('Build Docker Image') {
+            steps {
+                script {
+                    run("docker build --build-arg FAULTY=${params.FAULTY_BUILD} -t ${IMAGE}:${TAG} -t ${IMAGE}:latest .")
+                }
+            }
+        }
+
+        stage('Test Application') {
+            steps {
+                // Verify that the image was built successfully
+                run("docker image inspect ${IMAGE}:${TAG}")
+            }
+        }
+
+        stage('Push Image') {
+            steps {
+                withCredentials([usernamePassword(credentialsId: 'dockerhub-creds',
+                                                  usernameVariable: 'DH_USER', passwordVariable: 'DH_PASS')]) {
+                    script {
+                        run("echo ${v('DH_PASS')}| docker login -u ${v('DH_USER')} --password-stdin")
+                        run("docker push ${IMAGE}:${TAG}")
+                        run("docker push ${IMAGE}:latest")
+                    }
+                }
+            }
+        }
+
+        stage('Deploy to Kubernetes') {
+            steps {
+                withCredentials([file(credentialsId: 'kubeconfig', variable: 'KUBECONFIG')]) {
+                    script {
+                        run("kubectl get deployment ${APP} || kubectl apply -f deployment.yaml")
+                        run("kubectl set image deployment/${APP} ${APP}=${IMAGE}:${TAG}")
+
+                        try {
+                            run("kubectl rollout status deployment/${APP} --timeout=90s")
+                        } catch (err) {
+                            echo "Rollout FAILED - rolling back to previous stable release"
+                            run("kubectl rollout undo deployment/${APP}")
+                            run("kubectl rollout status deployment/${APP} --timeout=120s")
+                            error("Release ${TAG} failed. Rolled back to previous stable version.")
+                        }
+                    }
+                }
+            }
+        }
+
+        stage('Verify Pods') {
+            steps {
+                withCredentials([file(credentialsId: 'kubeconfig', variable: 'KUBECONFIG')]) {
+                    run("kubectl get pods -l app=${APP}")
+                    run("kubectl get svc event-portal-service")
+                }
+            }
+        }
+    }
+
+    post {
+        success { echo "Deployed. Open http://localhost:30083" }
+        failure {
+            withCredentials([file(credentialsId: 'kubeconfig', variable: 'KUBECONFIG')]) {
+                script {
+                    run("kubectl get pods -l app=${APP}")
+                    run("kubectl rollout history deployment/${APP}")
+                }
+            }
+        }
+    }
+}

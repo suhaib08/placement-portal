@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Automated Student Placement Portal</title>
+<style>
+  :root { --navy:#12284c; --blue:#2563eb; --bg:#f3f6fb; --card:#fff; --muted:#5b6679; --ok:#15803d; }
+  * { box-sizing:border-box; margin:0; padding:0; }
+  body { font-family:"Segoe UI",Arial,sans-serif; background:var(--bg); color:#1b2433; line-height:1.5; }
+  header { background:var(--navy); color:#fff; padding:28px 20px; text-align:center; }
+  header p { opacity:.8; margin-top:4px; }
+  nav { background:#0d1f3c; text-align:center; padding:10px; position:sticky; top:0; }
+  nav a { color:#cfe0ff; margin:0 14px; text-decoration:none; font-size:.95rem; }
+  nav a:hover { color:#fff; text-decoration:underline; }
+  main { max-width:1050px; margin:0 auto; padding:24px 16px 48px; }
+  section { margin-top:34px; }
+  h2 { color:var(--navy); border-left:5px solid var(--blue); padding-left:10px; margin-bottom:16px; }
+  .grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(220px,1fr)); gap:16px; }
+  .card { background:var(--card); border-radius:10px; padding:18px; box-shadow:0 1px 4px rgba(0,0,0,.08); }
+  .stat { text-align:center; }
+  .stat .num { font-size:2.1rem; font-weight:700; color:var(--blue); }
+  .stat .lbl { color:var(--muted); font-size:.9rem; }
+  .avatar { width:54px; height:54px; border-radius:50%; background:var(--blue); color:#fff; display:flex; align-items:center; justify-content:center; font-weight:700; margin-bottom:10px; }
+  .tag { display:inline-block; background:#e5edff; color:#1d4ed8; border-radius:12px; padding:2px 10px; font-size:.78rem; margin:3px 3px 0 0; }
+  .placed { color:var(--ok); font-weight:600; }
+  table { width:100%; border-collapse:collapse; background:var(--card); border-radius:10px; overflow:hidden; box-shadow:0 1px 4px rgba(0,0,0,.08); }
+  th, td { padding:12px 14px; text-align:left; font-size:.93rem; }
+  th { background:var(--navy); color:#fff; }
+  tr:nth-child(even) td { background:#f7f9fd; }
+  .drive { display:flex; gap:14px; align-items:center; }
+  .date { background:var(--navy); color:#fff; border-radius:8px; padding:8px 12px; text-align:center; min-width:62px; }
+  .date b { display:block; font-size:1.4rem; }
+  footer { text-align:center; color:var(--muted); padding:20px; font-size:.85rem; }
+</style>
+</head>
+<body>
+<header>
+  <h1>University Placement Cell</h1>
+  <p>Automated Student Placement Portal &middot; Batch 2026</p>
+</header>
+<nav>
+  <a href="#stats">Statistics</a><a href="#students">Student Profiles</a>
+  <a href="#companies">Companies</a><a href="#eligibility">Eligibility</a><a href="#drives">Upcoming Drives</a>
+</nav>
+<main>
+
+  <section id="stats">
+    <h2>Placement Statistics</h2>
+    <div class="grid">
+      <div class="card stat"><div class="num">92%</div><div class="lbl">Students Placed</div></div>
+      <div class="card stat"><div class="num">45 LPA</div><div class="lbl">Highest Package</div></div>
+      <div class="card stat"><div class="num">8.4 LPA</div><div class="lbl">Average Package</div></div>
+      <div class="card stat"><div class="num">120+</div><div class="lbl">Recruiting Companies</div></div>
+    </div>
+  </section>
+
+  <section id="students">
+    <h2>Student Profiles</h2>
+    <div class="grid">
+      <div class="card"><div class="avatar">AR</div><h3>Aarav Reddy</h3><p>B.Tech CSE &middot; CGPA 9.1</p>
+        <span class="tag">Java</span><span class="tag">Kubernetes</span><span class="tag">React</span>
+        <p class="placed">Placed &ndash; Google (32 LPA)</p></div>
+      <div class="card"><div class="avatar">PS</div><h3>Priya Sharma</h3><p>B.Tech IT &middot; CGPA 8.8</p>
+        <span class="tag">Python</span><span class="tag">ML</span><span class="tag">SQL</span>
+        <p class="placed">Placed &ndash; Microsoft (28 LPA)</p></div>
+      <div class="card"><div class="avatar">KM</div><h3>Karthik M</h3><p>B.Tech ECE &middot; CGPA 8.2</p>
+        <span class="tag">Embedded C</span><span class="tag">IoT</span>
+        <p class="placed">Placed &ndash; Bosch (12 LPA)</p></div>
+      <div class="card"><div class="avatar">NF</div><h3>Nadia Fathima</h3><p>B.Tech CSE &middot; CGPA 8.5</p>
+        <span class="tag">DevOps</span><span class="tag">Docker</span><span class="tag">Jenkins</span>
+        <p style="color:#b45309;font-weight:600;">In process &ndash; 2 interviews pending</p></div>
+    </div>
+  </section>
+
+  <section id="companies">
+    <h2>Company Information</h2>
+    <table>
+      <tr><th>Company</th><th>Sector</th><th>Roles</th><th>Package (LPA)</th></tr>
+      <tr><td>Google</td><td>Technology</td><td>SDE, SRE</td><td>30 &ndash; 45</td></tr>
+      <tr><td>Microsoft</td><td>Technology</td><td>SDE, Cloud Engineer</td><td>25 &ndash; 40</td></tr>
+      <tr><td>TCS</td><td>IT Services</td><td>Systems Engineer</td><td>7 &ndash; 11</td></tr>
+      <tr><td>Infosys</td><td>IT Services</td><td>Specialist Programmer</td><td>9 &ndash; 12</td></tr>
+      <tr><td>Bosch</td><td>Engineering</td><td>Embedded Engineer</td><td>10 &ndash; 14</td></tr>
+    </table>
+  </section>
+
+  <section id="eligibility">
+    <h2>Eligibility Criteria</h2>
+    <div class="grid">
+      <div class="card"><h3>Tier 1 (Dream)</h3><p>CGPA &ge; 8.5, no standing arrears, no prior offer above 10 LPA.</p></div>
+      <div class="card"><h3>Tier 2 (Core / Product)</h3><p>CGPA &ge; 7.5, no more than 1 history of arrear, cleared.</p></div>
+      <div class="card"><h3>Tier 3 (Mass Recruiters)</h3><p>CGPA &ge; 6.5, no standing arrears, 75% attendance.</p></div>
+    </div>
+  </section>
+
+  <section id="drives">
+    <h2>Upcoming Recruitment Drives</h2>
+    <div class="grid">
+      <div class="card drive"><div class="date"><b>22</b>OCT</div><div><h3>Amazon</h3><p>Online test + 3 interview rounds &middot; Tier 1</p></div></div>
+      <div class="card drive"><div class="date"><b>27</b>OCT</div><div><h3>Wipro</h3><p>Aptitude + HR &middot; Tier 3</p></div></div>
+      <div class="card drive"><div class="date"><b>03</b>NOV</div><div><h3>Zoho</h3><p>Coding rounds on campus &middot; Tier 2</p></div></div>
+      <div class="card drive"><div class="date"><b>10</b>NOV</div><div><h3>Cognizant</h3><p>Pool drive &middot; Tier 3</p></div></div>
+    </div>
+  </section>
+
+</main>
+<footer>Deployed automatically via Jenkins &middot; Docker &middot; Kubernetes</footer>
+</body>
+</html>

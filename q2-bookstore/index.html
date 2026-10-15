@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>PageTurner Online Bookstore</title>
+<style>
+  :root { --ink:#2b2118; --accent:#b45309; --bg:#fbf6ee; --card:#fff; --ok:#15803d; --no:#b91c1c; }
+  * { box-sizing:border-box; margin:0; padding:0; }
+  body { font-family:Georgia,"Times New Roman",serif; background:var(--bg); color:var(--ink); }
+  header { background:var(--ink); color:#fdf3e3; padding:22px 20px; display:flex; flex-wrap:wrap; justify-content:space-between; align-items:center; gap:12px; }
+  header h1 { font-size:1.6rem; }
+  header h1 span { color:#f59e0b; }
+  .cartbtn { background:var(--accent); color:#fff; border:0; padding:10px 18px; border-radius:6px; cursor:pointer; font-size:1rem; }
+  main { max-width:1100px; margin:0 auto; padding:20px 16px 50px; }
+  .toolbar { display:flex; flex-wrap:wrap; gap:10px; margin:10px 0 22px; }
+  .toolbar input, .toolbar select { padding:10px 12px; border:1px solid #cdbfa9; border-radius:6px; font-size:1rem; }
+  .toolbar input { flex:1; min-width:220px; }
+  .books { display:grid; grid-template-columns:repeat(auto-fill,minmax(230px,1fr)); gap:18px; }
+  .book { background:var(--card); border-radius:10px; padding:16px; box-shadow:0 1px 5px rgba(0,0,0,.1); display:flex; flex-direction:column; }
+  .cover { height:130px; border-radius:6px; display:flex; align-items:center; justify-content:center; color:#fff; font-size:2.4rem; margin-bottom:12px; }
+  .book h3 { font-size:1.05rem; }
+  .author { color:#6b5b47; font-size:.9rem; margin:2px 0 8px; }
+  .cat { font-size:.75rem; background:#f1e6d3; border-radius:10px; padding:2px 10px; align-self:flex-start; }
+  .price { font-size:1.25rem; font-weight:700; margin:10px 0 4px; }
+  .in { color:var(--ok); font-size:.85rem; font-weight:600; }
+  .out { color:var(--no); font-size:.85rem; font-weight:600; }
+  .add { margin-top:auto; background:var(--ink); color:#fff; border:0; padding:9px; border-radius:6px; cursor:pointer; }
+  .add:disabled { background:#aaa; cursor:not-allowed; }
+  .panel { background:var(--card); border-radius:10px; padding:20px; margin-top:30px; box-shadow:0 1px 5px rgba(0,0,0,.1); }
+  .panel h2 { margin-bottom:12px; }
+  .row { display:flex; justify-content:space-between; padding:6px 0; border-bottom:1px dashed #e4d8c4; }
+  .steps { display:flex; gap:8px; margin-top:14px; flex-wrap:wrap; }
+  .step { flex:1; min-width:110px; text-align:center; padding:10px 4px; border-radius:6px; background:#eee; font-size:.85rem; }
+  .step.done { background:var(--ok); color:#fff; }
+  .panel input { padding:9px; border:1px solid #cdbfa9; border-radius:6px; }
+  .panel button { padding:9px 16px; border:0; border-radius:6px; background:var(--accent); color:#fff; cursor:pointer; }
+  footer { text-align:center; padding:18px; color:#6b5b47; font-size:.85rem; }
+</style>
+</head>
+<body>
+<header>
+  <h1>Page<span>Turner</span> Bookstore</h1>
+  <button class="cartbtn" onclick="document.getElementById('cart').scrollIntoView({behavior:'smooth'})">Cart (<span id="count">0</span>)</button>
+</header>
+
+<main>
+  <div class="toolbar">
+    <input id="search" type="search" placeholder="Search by title or author...">
+    <select id="category">
+      <option value="all">All categories</option>
+      <option>Fiction</option><option>Technology</option><option>Science</option>
+      <option>History</option><option>Self-Help</option>
+    </select>
+  </div>
+
+  <div class="books" id="books">
+    <div class="book" data-title="The Phoenix Project" data-author="Gene Kim" data-cat="Technology" data-price="499">
+      <div class="cover" style="background:#7c2d12">&#128293;</div><h3>The Phoenix Project</h3><p class="author">Gene Kim</p><span class="cat">Technology</span>
+      <p class="price">&#8377;499</p><p class="in">In stock</p><button class="add">Add to cart</button></div>
+    <div class="book" data-title="Clean Code" data-author="Robert C. Martin" data-cat="Technology" data-price="650">
+      <div class="cover" style="background:#1e3a8a">&#128187;</div><h3>Clean Code</h3><p class="author">Robert C. Martin</p><span class="cat">Technology</span>
+      <p class="price">&#8377;650</p><p class="in">In stock</p><button class="add">Add to cart</button></div>
+    <div class="book" data-title="To Kill a Mockingbird" data-author="Harper Lee" data-cat="Fiction" data-price="350">
+      <div class="cover" style="background:#166534">&#128038;</div><h3>To Kill a Mockingbird</h3><p class="author">Harper Lee</p><span class="cat">Fiction</span>
+      <p class="price">&#8377;350</p><p class="in">In stock</p><button class="add">Add to cart</button></div>
+    <div class="book" data-title="A Brief History of Time" data-author="Stephen Hawking" data-cat="Science" data-price="420">
+      <div class="cover" style="background:#312e81">&#127756;</div><h3>A Brief History of Time</h3><p class="author">Stephen Hawking</p><span class="cat">Science</span>
+      <p class="price">&#8377;420</p><p class="out">Out of stock</p><button class="add" disabled>Unavailable</button></div>
+    <div class="book" data-title="Sapiens" data-author="Yuval Noah Harari" data-cat="History" data-price="550">
+      <div class="cover" style="background:#854d0e">&#127963;</div><h3>Sapiens</h3><p class="author">Yuval Noah Harari</p><span class="cat">History</span>
+      <p class="price">&#8377;550</p><p class="in">In stock</p><button class="add">Add to cart</button></div>
+    <div class="book" data-title="Atomic Habits" data-author="James Clear" data-cat="Self-Help" data-price="399">
+      <div class="cover" style="background:#9d174d">&#9889;</div><h3>Atomic Habits</h3><p class="author">James Clear</p><span class="cat">Self-Help</span>
+      <p class="price">&#8377;399</p><p class="in">In stock</p><button class="add">Add to cart</button></div>
+    <div class="book" data-title="The Alchemist" data-author="Paulo Coelho" data-cat="Fiction" data-price="299">
+      <div class="cover" style="background:#a16207">&#127964;</div><h3>The Alchemist</h3><p class="author">Paulo Coelho</p><span class="cat">Fiction</span>
+      <p class="price">&#8377;299</p><p class="out">Out of stock</p><button class="add" disabled>Unavailable</button></div>
+    <div class="book" data-title="Site Reliability Engineering" data-author="Betsy Beyer" data-cat="Technology" data-price="720">
+      <div class="cover" style="background:#0f766e">&#9881;</div><h3>Site Reliability Engineering</h3><p class="author">Betsy Beyer</p><span class="cat">Technology</span>
+      <p class="price">&#8377;720</p><p class="in">In stock</p><button class="add">Add to cart</button></div>
+  </div>
+
+  <div class="panel" id="cart">
+    <h2>Shopping Cart</h2>
+    <div id="items"><p>Your cart is empty.</p></div>
+    <div class="row" style="font-weight:700"><span>Total</span><span>&#8377;<span id="total">0</span></span></div>
+    <p style="margin-top:14px"><button id="order">Place Order</button> <span id="msg"></span></p>
+  </div>
+
+  <div class="panel" id="track">
+    <h2>Track Order</h2>
+    <input id="oid" placeholder="Order ID e.g. PT1001"> <button id="trackbtn">Track</button>
+    <div class="steps" id="steps" style="display:none">
+      <div class="step">Placed</div><div class="step">Packed</div><div class="step">Shipped</div><div class="step">Delivered</div>
+    </div>
+    <p id="tmsg" style="margin-top:10px"></p>
+  </div>
+
+  <!-- NEW FEATURE HERE -->
+</main>
+<footer>Built, tested and deployed by Jenkins &middot; Docker &middot; Kubernetes</footer>
+
+<script>
+  var cart = [];
+  var books = document.querySelectorAll('.book');
+
+  function filter() {
+    var q = document.getElementById('search').value.toLowerCase();
+    var c = document.getElementById('category').value;
+    books.forEach(function (b) {
+      var text = (b.dataset.title + ' ' + b.dataset.author).toLowerCase();
+      var show = text.indexOf(q) !== -1 && (c === 'all' || b.dataset.cat === c);
+      b.style.display = show ? '' : 'none';
+    });
+  }
+  document.getElementById('search').addEventListener('input', filter);
+  document.getElementById('category').addEventListener('change', filter);
+
+  function render() {
+    var total = 0, html = '';
+    cart.forEach(function (it, i) {
+      total += it.price;
+      html += '<div class="row"><span>' + it.title + '</span><span>&#8377;' + it.price +
+              ' <a href="#" onclick="removeItem(' + i + ');return false;">remove</a></span></div>';
+    });
+    document.getElementById('items').innerHTML = html || '<p>Your cart is empty.</p>';
+    document.getElementById('total').textContent = total;
+    document.getElementById('count').textContent = cart.length;
+  }
+  function removeItem(i) { cart.splice(i, 1); render(); }
+
+  document.querySelectorAll('.add').forEach(function (btn) {
+    btn.addEventListener('click', function () {
+      var b = btn.closest('.book');
+      cart.push({ title: b.dataset.title, price: Number(b.dataset.price) });
+      render();
+    });
+  });
+
+  var statusMap = { PT1001: 1, PT1002: 2, PT1003: 3, PT1004: 4 };
+  document.getElementById('order').addEventListener('click', function () {
+    if (!cart.length) { document.getElementById('msg').textContent = 'Add a book first.'; return; }
+    var id = 'PT' + (1005 + Math.floor(Math.random() * 90));
+    statusMap[id] = 1; cart = []; render();
+    document.getElementById('msg').textContent = 'Order placed! Your order ID is ' + id;
+  });
+  document.getElementById('trackbtn').addEventListener('click', function () {
+    var id = document.getElementById('oid').value.trim().toUpperCase();
+    var s = statusMap[id];
+    var steps = document.querySelectorAll('#steps .step');
+    document.getElementById('steps').style.display = s ? 'flex' : 'none';
+    steps.forEach(function (el, i) { el.className = 'step' + (i < s ? ' done' : ''); });
+    document.getElementById('tmsg').textContent = s ? 'Status: ' + steps[s - 1].textContent : 'Order not found. Try PT1001 - PT1004.';
+  });
+</script>
+</body>
+</html>
