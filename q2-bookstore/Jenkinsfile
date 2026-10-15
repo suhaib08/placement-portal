@@ -72,9 +72,9 @@ pipeline {
                 withCredentials([usernamePassword(credentialsId: 'dockerhub-creds',
                                                   usernameVariable: 'DH_USER', passwordVariable: 'DH_PASS')]) {
                     script {
-                        run("echo ${v('DH_PASS')}| docker login -u ${v('DH_USER')} --password-stdin")
-                        run("docker push ${IMAGE}:${TAG}")
-                        run("docker push ${IMAGE}:latest")
+                        run("echo ${v('DH_PASS')}| \"${DOCKER_CLI}\" login -u ${v('DH_USER')} --password-stdin")
+                        run("\"${DOCKER_CLI}\" push ${IMAGE}:${TAG}")
+                        run("\"${DOCKER_CLI}\" push ${IMAGE}:latest")
                     }
                 }
             }
